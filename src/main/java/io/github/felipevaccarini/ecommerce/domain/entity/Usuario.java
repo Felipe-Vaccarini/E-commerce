@@ -8,6 +8,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import jakarta.validation.constraints.NotBlank;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -33,8 +35,11 @@ public class Usuario {
     @Email
     @NotBlank
     @Size(max = 254)
-    @Column(length = 254, nullable = false, unique = true)
+    @Column(name = "email", length = 254, nullable = false, unique = true)
     private String email;
+
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Pedido> pedidos;
 
 }
 
