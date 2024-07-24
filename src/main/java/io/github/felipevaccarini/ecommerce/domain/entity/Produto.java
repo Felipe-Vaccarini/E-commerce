@@ -38,4 +38,9 @@ public class Produto {
     @PositiveOrZero
     @Column(name = "estoque", nullable = false)
     private Integer estoque;
+
+    @NotNull
+    @ManyToOne
+    @JoinColumn(name = "categoria_id", nullable = false)
+    private Categoria categoria;
 }
