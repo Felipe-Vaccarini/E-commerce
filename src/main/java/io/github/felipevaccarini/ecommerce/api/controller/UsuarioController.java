@@ -1,4 +1,4 @@
-package io.github.felipevaccarini.ecommerce.controller;
+package io.github.felipevaccarini.ecommerce.api.controller;
 
 import io.github.felipevaccarini.ecommerce.domain.entity.Usuario;
 import io.github.felipevaccarini.ecommerce.service.impl.UsuarioService;
