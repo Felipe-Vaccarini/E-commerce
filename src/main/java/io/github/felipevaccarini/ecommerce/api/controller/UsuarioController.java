@@ -3,7 +3,6 @@ package io.github.felipevaccarini.ecommerce.api.controller;
 import io.github.felipevaccarini.ecommerce.api.dto.UsuarioDTO;
 import io.github.felipevaccarini.ecommerce.domain.entity.Usuario;
 import io.github.felipevaccarini.ecommerce.service.impl.UsuarioService;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
