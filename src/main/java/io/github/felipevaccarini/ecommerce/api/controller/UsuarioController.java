@@ -6,7 +6,6 @@ import io.github.felipevaccarini.ecommerce.service.impl.UsuarioService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,19 +17,17 @@ import java.util.stream.Collectors;
 public class UsuarioController {
 
     private final UsuarioService usuarioService;
-    private final ModelMapper modelMapper;
 
     @Autowired
-    public UsuarioController(UsuarioService usuarioService, ModelMapper modelMapper) {
+    public UsuarioController(UsuarioService usuarioService) {
         this.usuarioService = usuarioService;
-        this.modelMapper = modelMapper;
     }
 
     @GetMapping
     public ResponseEntity<List<UsuarioDTO>> obterTodosUsuarios() {
         List<Usuario> usuarios = usuarioService.findAll();
         List<UsuarioDTO> usuariosDTO = usuarios.stream()
-                .map(usuario -> modelMapper.map(usuario, UsuarioDTO.class))
+                .map(UsuarioDTO::fromEntity)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(usuariosDTO);
     }
@@ -38,21 +35,36 @@ public class UsuarioController {
     @GetMapping("/{id}")
     public ResponseEntity<UsuarioDTO> obterUsuarioPorId(@PathVariable Long id) {
         Optional<Usuario> usuario = usuarioService.findById(id);
-        return usuario.map(value -> ResponseEntity.ok(modelMapper.map(value, UsuarioDTO.class)))
+        return usuario.map(value -> ResponseEntity.ok(UsuarioDTO.fromEntity(value)))
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PostMapping
     public ResponseEntity<UsuarioDTO> criarUsuario(@RequestBody UsuarioDTO usuarioDTO) {
-        Usuario usuario = modelMapper.map(usuarioDTO, Usuario.class);
+        Usuario usuario = UsuarioDTO.toEntity(usuarioDTO);
         Usuario usuarioSalvo = usuarioService.save(usuario);
-        UsuarioDTO usuarioSalvoDTO = modelMapper.map(usuarioSalvo, UsuarioDTO.class);
+        UsuarioDTO usuarioSalvoDTO = UsuarioDTO.fromEntity(usuarioSalvo);
         return ResponseEntity.ok(usuarioSalvoDTO);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<UsuarioDTO> atualizarUsuario(@PathVariable Long id, @RequestBody UsuarioDTO usuarioDTO){
+        Optional<Usuario> usuarioExistente = usuarioService.findById(id);
+        if (usuarioExistente.isPresent()) {
+            Usuario usuario = UsuarioDTO.toEntity(usuarioDTO);
+            usuario.setId(id);
+            Usuario usuarioAtualizado = usuarioService.save(usuario);
+            return ResponseEntity.ok(UsuarioDTO.fromEntity(usuarioAtualizado));
+        }
+        return ResponseEntity.notFound().build();
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletarUsuario(@PathVariable Long id) {
-        usuarioService.deleteById(id);
-        return ResponseEntity.noContent().build();
+        if (usuarioService.findById(id).isPresent()) {
+            usuarioService.deleteById(id);
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.notFound().build();
     }
 }
